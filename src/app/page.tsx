@@ -69,50 +69,50 @@ export default function HomePage() {
     setIsLoading(false);
   }, [applyClientSideFilters]); // applyClientSideFilters is stable due to useCallback
 
-  useEffect(() => {
-    const getRandomElement = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  // useEffect(() => {
+  //   const getRandomElement = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
-    const generateNewDamageReport = (existingCount: number): DamageReport => {
-      const newIdSuffix = Date.now() + Math.random().toString(36).substring(2, 5);
-      const id = `report-new-${newIdSuffix}`;
-      const randomFacilityType = getRandomElement(facilityTypes.map(ft => ft.value as FacilityType));
-      const randomDamageSeverity = getRandomElement(damageSeverityConstants.map(ds => ds.value as DamageSeverity));
-      return {
-        id,
-        facilityType: randomFacilityType,
-        damageSeverity: randomDamageSeverity,
-        imageUrl: `https://placehold.co/${600 + existingCount * 7}x${400 + existingCount * 4}.png`,
-        gcsUrl: `gs://roadwatch-bucket/${id}.jpg`,
-        timestamp: new Date(),
-        location: `새로운 위치 ${existingCount + 100}`,
-        description: `[새 보고서] ${getFacilityTypeLabel(randomFacilityType)}에 새로운 손상이 발견되었습니다. 손상 정도: ${getDamageSeverityLabel(randomDamageSeverity)}.`,
-        acknowledged: false,
-      };
-    };
+  //   const generateNewDamageReport = (existingCount: number): DamageReport => {
+  //     const newIdSuffix = Date.now() + Math.random().toString(36).substring(2, 5);
+  //     const id = `report-new-${newIdSuffix}`;
+  //     const randomFacilityType = getRandomElement(facilityTypes.map(ft => ft.value as FacilityType));
+  //     const randomDamageSeverity = getRandomElement(damageSeverityConstants.map(ds => ds.value as DamageSeverity));
+  //     return {
+  //       id,
+  //       facilityType: randomFacilityType,
+  //       damageSeverity: randomDamageSeverity,
+  //       imageUrl: `https://placehold.co/${600 + existingCount * 7}x${400 + existingCount * 4}.png`,
+  //       gcsUrl: `gs://roadwatch-bucket/${id}.jpg`,
+  //       timestamp: new Date(),
+  //       location: `새로운 위치 ${existingCount + 100}`,
+  //       description: `[새 보고서] ${getFacilityTypeLabel(randomFacilityType)}에 새로운 손상이 발견되었습니다. 손상 정도: ${getDamageSeverityLabel(randomDamageSeverity)}.`,
+  //       acknowledged: false,
+  //     };
+  //   };
 
-    const intervalId = setInterval(() => {
-      if (allReportsRef.current.length >= 25) { // Limit total reports for demo
-        // clearInterval(intervalId); // Optionally stop adding
-        return;
-      }
+  //   const intervalId = setInterval(() => {
+  //     if (allReportsRef.current.length >= 25) { // Limit total reports for demo
+  //       // clearInterval(intervalId); // Optionally stop adding
+  //       return;
+  //     }
 
-      const newReport = generateNewDamageReport(allReportsRef.current.length);
+  //     const newReport = generateNewDamageReport(allReportsRef.current.length);
       
-      const updatedAllReportsList = [newReport, ...allReportsRef.current];
-      setAllReports(updatedAllReportsList);
+  //     const updatedAllReportsList = [newReport, ...allReportsRef.current];
+  //     setAllReports(updatedAllReportsList);
       
-      // Re-apply current client-side filters to the updated list
-      setDisplayedReports(applyClientSideFilters(updatedAllReportsList, currentFiltersRef.current));
+  //     // Re-apply current client-side filters to the updated list
+  //     setDisplayedReports(applyClientSideFilters(updatedAllReportsList, currentFiltersRef.current));
 
-      toast({
-        title: "✨ 새로운 보고서 추가됨",
-        description: `ID ${newReport.id} (${getFacilityTypeLabel(newReport.facilityType)}) 보고서가 목록에 추가되었습니다.`,
-        variant: "success",
-      });
-    }, 15000); // Add a new report every 15 seconds
+  //     toast({
+  //       title: "✨ 새로운 보고서 추가됨",
+  //       description: `ID ${newReport.id} (${getFacilityTypeLabel(newReport.facilityType)}) 보고서가 목록에 추가되었습니다.`,
+  //       variant: "success",
+  //     });
+  //   }, 15000); // Add a new report every 15 seconds
 
-    return () => clearInterval(intervalId);
-  }, [applyClientSideFilters, toast]); // Stable dependencies
+  //   return () => clearInterval(intervalId);
+  // }, [applyClientSideFilters, toast]); // Stable dependencies
 
   const handleAcknowledge = (id: string) => {
     const updatedAllReports = allReports.map(report =>
@@ -166,8 +166,8 @@ export default function HomePage() {
     if (useAIFilter) {
       try {
         const result = await filterDamageImages({
-          facilityType: facilityTypeFilter as FacilityType,
-          damageSeverity: damageSeverityFilter as DamageSeverity,
+          facilityType: facilityTypeFilter as FacilityType, // Cast to FacilityType, 'all' is handled by useAIFilter condition
+          damageSeverity: damageSeverityFilter as DamageSeverity, // Cast to DamageSeverity
           imageIds: imageIdsForAI, // imageIdsForAI is derived from allReports
         });
 
