@@ -11,8 +11,9 @@ import { filterDamageImages } from '@/ai/flows/filter-damage-images';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { AlertTriangle, SearchX, Download } from 'lucide-react';
+import { AlertTriangle, SearchX, Download, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { facilityTypes, damageSeverities as damageSeverityConstants, modelOptions } from '@/lib/constants';
 import { format } from 'date-fns';
 
@@ -36,6 +37,7 @@ export default function HomePage() {
   const [displayedReports, setDisplayedReports] = useState<DamageReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const [currentFilters, setCurrentFilters] = useState<{
@@ -143,6 +145,7 @@ export default function HomePage() {
         return facilityMatch && severityMatch && acknowledgedMatch;
     });
     setDisplayedReports(currentlyDisplayed);
+    setIsUploadDialogOpen(false); // Close dialog on successful upload
 
     toast({
       title: "✅ 새 보고서 추가됨",
@@ -328,7 +331,6 @@ export default function HomePage() {
       const augmentedLabel = report.isAugmented ? '예' : '아니오';
       const formattedTimestamp = format(new Date(report.timestamp), 'yyyy-MM-dd HH:mm:ss');
 
-      // Escape commas and quotes in description and location
       const escapeCsvField = (field: string | undefined) => {
         if (field === undefined || field === null) return '';
         let escaped = field.toString().replace(/"/g, '""');
@@ -351,7 +353,7 @@ export default function HomePage() {
     });
 
     const csvString = [headers.join(','), ...csvRows].join('\n');
-    const blob = new Blob([`\uFEFF${csvString}`], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel
+    const blob = new Blob([`\uFEFF${csvString}`], { type: 'text/csv;charset=utf-8;' }); 
     const link = document.createElement('a');
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
@@ -408,16 +410,33 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
-      <ImageUploadForm onImageUpload={handleImageUpload} />
-      <DamageFilter onFilter={handleFilter} onReset={handleResetFilters} isLoading={isFiltering} />
-      
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between items-center mb-4">
+        <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <UploadCloud className="mr-2 h-4 w-4" />
+              새 보고서 업로드
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <UploadCloud className="mr-2 h-5 w-5 text-primary" />
+                새로운 손상 보고서 업로드
+              </DialogTitle>
+            </DialogHeader>
+            <ImageUploadForm onImageUpload={handleImageUpload} />
+          </DialogContent>
+        </Dialog>
+        
         <Button onClick={handleDownloadCsv} variant="outline">
           <Download className="mr-2 h-4 w-4" />
           결과 다운로드 (CSV)
         </Button>
       </div>
 
+      <DamageFilter onFilter={handleFilter} onReset={handleResetFilters} isLoading={isFiltering} />
+      
       {isFiltering && (
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: displayedReports.length || mockDamageReports.length || 3 }).map((_, i) => (
@@ -469,4 +488,3 @@ export default function HomePage() {
     </div>
   );
 }
-
