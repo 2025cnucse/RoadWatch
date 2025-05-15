@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'RoadWatch - Damage Detection Admin',
-  description: 'Manage and review road facility damage reports.',
+  title: 'RoadWatch - 도로 손상 관리 시스템',
+  description: '도로 시설물 손상 보고서를 관리하고 검토합니다.',
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="ko" className={inter.variable}>
       <body className="antialiased">
         <AppLayout>
           {children}
