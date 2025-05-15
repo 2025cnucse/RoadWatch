@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -53,8 +54,9 @@ Damage Severity: {{{damageSeverity}}}
 Image IDs: {{{imageIds}}}
 
 Return only the IDs of the images that match both the facility type and damage severity.
-
-Filtered Image IDs:`,
+Ensure the output for filteredImageIds is a JSON array of strings. For example: {"filteredImageIds": ["id1", "id2"]}.
+If no images match, return an empty array: {"filteredImageIds": []}.
+`,
 });
 
 const filterDamageImagesFlow = ai.defineFlow(
@@ -65,14 +67,15 @@ const filterDamageImagesFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await filterDamageImagesPrompt(input);
-    // Ensure the output is parsed as a JSON array of strings
-    try {
-      const parsedOutput = JSON.parse(output!.filteredImageIds) as string[];
-      return {filteredImageIds: parsedOutput};
-    } catch (error) {
-      // If parsing fails, return an empty array to avoid crashing the application
-      console.error('Failed to parse LLM output:', error);
-      return {filteredImageIds: []};
+    
+    if (output && Array.isArray(output.filteredImageIds)) {
+      return { filteredImageIds: output.filteredImageIds };
     }
+    
+    // Log an error or handle the case where the output is not as expected
+    console.error('AI output for filteredImageIds was not in the expected format or was undefined:', output);
+    // Return an empty array to prevent crashes and indicate no items were successfully filtered by AI
+    return { filteredImageIds: [] };
   }
 );
+
