@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { mockDamageReports } from '@/lib/mock-data';
-import type { DamageReport, FacilityType, DamageSeverity } from '@/types';
+import type { DamageReport, FacilityType, DamageSeverity, AcknowledgedStatus } from '@/types';
 import { DamageFilter } from '@/components/damage-filter';
 import { DamageReportCard } from '@/components/damage-report-card';
 import { filterDamageImages } from '@/ai/flows/filter-damage-images';
@@ -27,13 +27,15 @@ export default function HomePage() {
 
   const handleAcknowledge = (id: string) => {
     const updateInList = (list: DamageReport[]) => list.map(report =>
-      report.id === id ? { ...report, acknowledged: true } : report
+      report.id === id ? { ...report, acknowledged: !report.acknowledged } : report // Toggle acknowledged state
     );
     setAllReports(prev => updateInList(prev));
     setDisplayedReports(prev => updateInList(prev));
+    
+    const targetReport = allReports.find(r => r.id === id);
     toast({
-      title: "Report Acknowledged",
-      description: `Report ID ${id} has been marked as acknowledged.`,
+      title: `Report ${targetReport?.acknowledged ? "Unacknowledged" : "Acknowledged"}`,
+      description: `Report ID ${id} status has been updated.`,
       variant: "success",
     });
   };
@@ -53,59 +55,78 @@ export default function HomePage() {
   
   const imageIdsForAI = useMemo(() => allReports.map(report => report.id), [allReports]);
 
-  const handleFilter = async (facilityType: FacilityType | 'all', damageSeverity: DamageSeverity | 'all') => {
+  const handleFilter = async (
+    facilityType: FacilityType | 'all',
+    damageSeverity: DamageSeverity | 'all',
+    acknowledgedStatus: AcknowledgedStatus
+  ) => {
     setIsFiltering(true);
 
-    if (facilityType === 'all' && damageSeverity === 'all') {
-      setDisplayedReports(allReports);
-      setIsFiltering(false);
-      toast({ title: "Filters Cleared", description: "Showing all reports.", variant: "default" });
-      return;
+    let reportsToFilter = allReports;
+
+    const useAIFilter = facilityType !== 'all' && damageSeverity !== 'all';
+
+    if (useAIFilter) {
+      try {
+        const result = await filterDamageImages({
+          facilityType: facilityType as FacilityType,
+          damageSeverity: damageSeverity as DamageSeverity,
+          imageIds: imageIdsForAI,
+        });
+
+        const aiFilteredIds = new Set(result.filteredImageIds);
+        reportsToFilter = allReports.filter(report => aiFilteredIds.has(report.id));
+        
+        toast({
+          title: "AI Content Filter Applied",
+          description: `AI found ${reportsToFilter.length} reports based on facility and severity. Acknowledged status filter applied subsequently.`,
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error filtering images with AI:", error);
+        toast({
+          title: "AI Filter Error",
+          description: "Could not filter images using AI. Applying other filters on all reports.",
+          variant: "destructive",
+        });
+        reportsToFilter = allReports; // Fallback to all reports if AI fails
+      }
+    } else {
+      // Apply client-side facility type and severity filters if AI is not used
+      reportsToFilter = reportsToFilter.filter(report => {
+        const facilityMatch = facilityType === 'all' || report.facilityType === facilityType;
+        const severityMatch = damageSeverity === 'all' || report.damageSeverity === damageSeverity;
+        return facilityMatch && severityMatch;
+      });
+    }
+
+    // Apply acknowledged status filter (always client-side on the current set of reportsToFilter)
+    const finalFilteredReports = reportsToFilter.filter(report => {
+      if (acknowledgedStatus === 'all') return true;
+      return acknowledgedStatus === 'acknowledged' ? report.acknowledged : !report.acknowledged;
+    });
+
+    setDisplayedReports(finalFilteredReports);
+
+    let toastMessage = `Found ${finalFilteredReports.length} reports matching your criteria.`;
+    if (facilityType === 'all' && damageSeverity === 'all' && acknowledgedStatus === 'all') {
+      toastMessage = "Filters Cleared. Showing all reports.";
     }
     
-    if (facilityType === 'all' || damageSeverity === 'all') {
-        const clientFiltered = allReports.filter(report => {
-            const facilityMatch = facilityType === 'all' || report.facilityType === facilityType;
-            const severityMatch = damageSeverity === 'all' || report.damageSeverity === damageSeverity;
-            return facilityMatch && severityMatch;
-        });
-        setDisplayedReports(clientFiltered);
-        setIsFiltering(false);
-        toast({ title: "Filters Applied", description: "Displaying filtered reports.", variant: "default" });
-        return;
-    }
+    toast({
+      title: "Filters Updated",
+      description: toastMessage,
+      variant: "default",
+    });
 
-    try {
-      const result = await filterDamageImages({
-        facilityType: facilityType as FacilityType,
-        damageSeverity: damageSeverity as DamageSeverity,
-        imageIds: imageIdsForAI,
-      });
-
-      const filteredIds = new Set(result.filteredImageIds);
-      const newDisplayedReports = allReports.filter(report => filteredIds.has(report.id));
-      setDisplayedReports(newDisplayedReports);
-
-      toast({
-        title: "AI Filter Applied",
-        description: `Found ${newDisplayedReports.length} reports matching your criteria.`,
-        variant: "default",
-      });
-    } catch (error) {
-      console.error("Error filtering images with AI:", error);
-      toast({
-        title: "AI Filter Error",
-        description: "Could not filter images using AI. Please try again. Displaying all reports.",
-        variant: "destructive",
-      });
-      setDisplayedReports(allReports); 
-    } finally {
-      setIsFiltering(false);
-    }
+    setIsFiltering(false);
   };
 
   const handleResetFilters = () => {
-    setDisplayedReports(allReports);
+    // This will trigger handleFilter with 'all' for all parameters via the DamageFilter component's reset
+    // so no need to directly call setDisplayedReports(allReports) here if DamageFilter calls onFilter on reset.
+    // However, to be safe and ensure immediate UI update if DamageFilter's onReset doesn't call onFilter immediately:
+    setDisplayedReports(allReports); 
     toast({ title: "Filters Reset", description: "Showing all reports.", variant: "default" });
   };
 
@@ -117,14 +138,15 @@ export default function HomePage() {
             <Skeleton className="h-8 w-1/3" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-1/3" />
             </div>
           </CardContent>
         </Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="flex flex-col h-full">
               <CardHeader><Skeleton className="h-6 w-2/3 mb-2" /><Skeleton className="w-full h-48" /></CardHeader>
@@ -142,8 +164,8 @@ export default function HomePage() {
       <DamageFilter onFilter={handleFilter} onReset={handleResetFilters} isLoading={isFiltering} />
       
       {isFiltering && (
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: displayedReports.length || 3 }).map((_, i) => (
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: displayedReports.length || mockDamageReports.length || 3 }).map((_, i) => (
              <Card key={i} className="flex flex-col h-full">
               <CardHeader><Skeleton className="h-6 w-2/3 mb-2" /><Skeleton className="w-full h-48" /></CardHeader>
               <CardContent className="flex-grow space-y-3"><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-3/4" /></CardContent>
@@ -166,7 +188,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {!isFiltering && displayedReports.length === 0 && (
+      {!isFiltering && displayedReports.length === 0 && (allReports.length > 0 || isFiltering) && ( // Show only if there were reports to filter or if filtering is active
         <Card className="mt-8">
           <CardContent className="pt-6 flex flex-col items-center justify-center text-center min-h-[300px]">
             <SearchX className="h-16 w-16 text-muted-foreground mb-4" />

@@ -3,10 +3,10 @@
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge, type BadgeProps } from '@/components/ui/badge'; // Added BadgeProps type
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 import type { DamageReport, DamageSeverity } from '@/types';
 import { FacilityIcon } from '@/components/icons';
-import { CheckCircle2, AlertCircle, CalendarDays, MapPin } from 'lucide-react';
+import { CheckCircle2, AlertCircle, CalendarDays, MapPin, RotateCcw } from 'lucide-react'; // Added RotateCcw
 import { format } from 'date-fns';
 import {
   Dialog,
@@ -58,7 +58,7 @@ const getAiHint = (facilityType: DamageReport['facilityType']): string => {
 
 export function DamageReportCard({ report, onAcknowledge, onSeverityChange }: DamageReportCardProps) {
   return (
-    <Card className={`flex flex-col h-full shadow-lg transition-all duration-300 hover:shadow-xl ${report.acknowledged ? 'opacity-70 bg-secondary/30' : 'bg-card'}`}>
+    <Card className={`flex flex-col h-full shadow-lg transition-all duration-300 hover:shadow-xl ${report.acknowledged ? 'bg-secondary/30' : 'bg-card'}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between mb-2">
           <CardTitle className="text-lg font-semibold flex items-center">
@@ -118,7 +118,8 @@ export function DamageReportCard({ report, onAcknowledge, onSeverityChange }: Da
           <Select
             value={report.damageSeverity}
             onValueChange={(newSeverity) => onSeverityChange(report.id, newSeverity as DamageSeverity)}
-            disabled={report.acknowledged}
+            // Severity can now be changed even if acknowledged
+            // disabled={report.acknowledged} 
           >
             <SelectTrigger id={`severity-select-${report.id}`} className="h-9">
               <SelectValue placeholder="Select severity" />
@@ -134,17 +135,16 @@ export function DamageReportCard({ report, onAcknowledge, onSeverityChange }: Da
       <CardFooter>
         <Button
           onClick={() => onAcknowledge(report.id)}
-          disabled={report.acknowledged}
           variant={report.acknowledged ? "outline" : "default"}
           className="w-full"
         >
           {report.acknowledged ? (
             <>
-              <CheckCircle2 className="mr-2 h-4 w-4" /> Acknowledged
+              <RotateCcw className="mr-2 h-4 w-4" /> Mark as Unacknowledged
             </>
           ) : (
             <>
-              <AlertCircle className="mr-2 h-4 w-4" /> Acknowledge
+              <CheckCircle2 className="mr-2 h-4 w-4" /> Mark as Acknowledged
             </>
           )}
         </Button>

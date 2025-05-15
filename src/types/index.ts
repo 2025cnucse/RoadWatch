@@ -1,5 +1,6 @@
 export type FacilityType = "Bridge" | "Road" | "Sign" | "Traffic Light" | "Guardrail" | "Other";
 export type DamageSeverity = "Low" | "Medium" | "High";
+export type AcknowledgedStatus = "all" | "acknowledged" | "unacknowledged";
 
 export interface DamageReport {
   id: string;

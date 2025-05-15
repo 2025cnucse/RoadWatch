@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { FacilityType, DamageSeverity } from '@/types';
-import { facilityTypes, damageSeverities } from '@/lib/constants'; // Updated import
+import type { FacilityType, DamageSeverity, AcknowledgedStatus } from '@/types';
+import { facilityTypes, damageSeverities, acknowledgedStatusOptions } from '@/lib/constants';
 import { FilterIcon, RotateCcwIcon } from 'lucide-react';
 
 interface DamageFilterProps {
-  onFilter: (facilityType: FacilityType | 'all', damageSeverity: DamageSeverity | 'all') => void;
+  onFilter: (facilityType: FacilityType | 'all', damageSeverity: DamageSeverity | 'all', acknowledgedStatus: AcknowledgedStatus) => void;
   onReset: () => void;
   isLoading: boolean;
 }
@@ -18,14 +18,16 @@ interface DamageFilterProps {
 export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps) {
   const [facilityType, setFacilityType] = useState<FacilityType | 'all'>('all');
   const [damageSeverity, setDamageSeverity] = useState<DamageSeverity | 'all'>('all');
+  const [acknowledgedStatus, setAcknowledgedStatus] = useState<AcknowledgedStatus>('all');
 
   const handleFilter = () => {
-    onFilter(facilityType, damageSeverity);
+    onFilter(facilityType, damageSeverity, acknowledgedStatus);
   };
 
   const handleReset = () => {
     setFacilityType('all');
     setDamageSeverity('all');
+    setAcknowledgedStatus('all');
     onReset();
   }
 
@@ -38,7 +40,7 @@ export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
           <div>
             <Label htmlFor="facilityType" className="text-sm font-medium">Facility Type</Label>
             <Select value={facilityType} onValueChange={(value) => setFacilityType(value as FacilityType | 'all')}>
@@ -63,6 +65,19 @@ export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps
                 <SelectItem value="all">All Severities</SelectItem>
                 {damageSeverities.map(severity => (
                   <SelectItem key={severity} value={severity}>{severity}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="acknowledgedStatus" className="text-sm font-medium">Acknowledged Status</Label>
+            <Select value={acknowledgedStatus} onValueChange={(value) => setAcknowledgedStatus(value as AcknowledgedStatus)}>
+              <SelectTrigger id="acknowledgedStatus" className="mt-1">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {acknowledgedStatusOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
