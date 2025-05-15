@@ -5,12 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { FacilityType, DamageSeverity, AcknowledgedStatus } from '@/types';
-import { facilityTypes, damageSeverities, acknowledgedStatusOptions } from '@/lib/constants';
-import { FilterIcon, RotateCcwIcon } from 'lucide-react';
+import type { FacilityType, DamageSeverity, AcknowledgedStatus, ModelType } from '@/types';
+import { facilityTypes, damageSeverities, acknowledgedStatusOptions, modelOptions } from '@/lib/constants';
+import { FilterIcon, RotateCcwIcon, Cpu } from 'lucide-react';
 
 interface DamageFilterProps {
-  onFilter: (facilityType: FacilityType | 'all', damageSeverity: DamageSeverity | 'all', acknowledgedStatus: AcknowledgedStatus) => void;
+  onFilter: (
+    facilityType: FacilityType | 'all',
+    damageSeverity: DamageSeverity | 'all',
+    acknowledgedStatus: AcknowledgedStatus,
+    model: ModelType
+  ) => void;
   onReset: () => void;
   isLoading: boolean;
 }
@@ -19,15 +24,17 @@ export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps
   const [facilityType, setFacilityType] = useState<FacilityType | 'all'>('all');
   const [damageSeverity, setDamageSeverity] = useState<DamageSeverity | 'all'>('all');
   const [acknowledgedStatus, setAcknowledgedStatus] = useState<AcknowledgedStatus>('all');
+  const [selectedModel, setSelectedModel] = useState<ModelType>('YOLOv12'); // Default to augmented model
 
   const handleFilter = () => {
-    onFilter(facilityType, damageSeverity, acknowledgedStatus);
+    onFilter(facilityType, damageSeverity, acknowledgedStatus, selectedModel);
   };
 
   const handleReset = () => {
     setFacilityType('all');
     setDamageSeverity('all');
     setAcknowledgedStatus('all');
+    setSelectedModel('YOLOv12'); // Reset to default model
     onReset();
   }
 
@@ -40,7 +47,22 @@ export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
+          <div>
+            <Label htmlFor="modelType" className="text-sm font-medium flex items-center">
+              <Cpu className="mr-1 h-4 w-4 text-muted-foreground" /> AI 모델 선택
+            </Label>
+            <Select value={selectedModel} onValueChange={(value) => setSelectedModel(value as ModelType)}>
+              <SelectTrigger id="modelType" className="mt-1">
+                <SelectValue placeholder="모델 선택" />
+              </SelectTrigger>
+              <SelectContent>
+                {modelOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div>
             <Label htmlFor="facilityType" className="text-sm font-medium">시설물 유형</Label>
             <Select value={facilityType} onValueChange={(value) => setFacilityType(value as FacilityType | 'all')}>
