@@ -1,11 +1,12 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { mockDamageReports } from '@/lib/mock-data';
 import type { DamageReport, FacilityType, DamageSeverity, AcknowledgedStatus, ModelType } from '@/types';
 import { DamageFilter } from '@/components/damage-filter';
 import { DamageReportCard } from '@/components/damage-report-card';
+import { ImageUploadForm } from '@/components/image-upload-form'; // New import
 import { filterDamageImages } from '@/ai/flows/filter-damage-images';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -59,7 +60,6 @@ export default function HomePage() {
     if (currentFiltersRef.current.model === 'YOLOv8') {
         initialDisplay = initialDisplay.filter(report => !report.isAugmented);
     }
-    // Apply other initial filters (facility, severity, acknowledged - all are 'all' initially)
      initialDisplay = initialDisplay.filter(report => {
         const facilityMatch = currentFiltersRef.current.facilityType === 'all' || report.facilityType === currentFiltersRef.current.facilityType;
         const severityMatch = currentFiltersRef.current.damageSeverity === 'all' || report.damageSeverity === currentFiltersRef.current.damageSeverity;
@@ -73,64 +73,53 @@ export default function HomePage() {
     setIsLoading(false);
   }, []);
 
+  const handleImageUpload = (file: File, isAugmented: boolean, imageDataUri: string) => {
+    const newReportId = `report-uploaded-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    
+    // For simplicity, let's use the first facility type and severity as default for uploaded images.
+    // In a real app, you might want dropdowns in the upload form itself.
+    const defaultFacilityType = facilityTypes[0]?.value || 'Other';
+    const defaultSeverity = damageSeverityConstants[0]?.value || 'Low';
 
-  // useEffect(() => {
-  //   const getRandomElement = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+    const newReport: DamageReport = {
+      id: newReportId,
+      facilityType: defaultFacilityType as FacilityType,
+      damageSeverity: defaultSeverity as DamageSeverity,
+      imageUrl: imageDataUri, // Use the data URI
+      timestamp: new Date(),
+      location: `업로드된 이미지: ${file.name.length > 30 ? file.name.substring(0, 27) + '...' : file.name}`,
+      description: `사용자가 업로드한 손상 보고서입니다. 증강 데이터 여부: ${isAugmented ? '예' : '아니오'}.`,
+      acknowledged: false,
+      isAugmented: isAugmented,
+    };
 
-  //   const generateNewDamageReport = (existingCount: number): DamageReport => {
-  //     const newIdSuffix = Date.now() + Math.random().toString(36).substring(2, 5);
-  //     const id = `report-new-${newIdSuffix}`;
-  //     const randomFacilityType = getRandomElement(facilityTypes.map(ft => ft.value as FacilityType));
-  //     const randomDamageSeverity = getRandomElement(damageSeverityConstants.map(ds => ds.value as DamageSeverity));
-  //     return {
-  //       id,
-  //       facilityType: randomFacilityType,
-  //       damageSeverity: randomDamageSeverity,
-  //       imageUrl: `https://placehold.co/${600 + existingCount * 7}x${400 + existingCount * 4}.png`,
-  //       gcsUrl: `gs://roadwatch-bucket/${id}.jpg`,
-  //       timestamp: new Date(),
-  //       location: `새로운 위치 ${existingCount + 100}`,
-  //       description: `[새 보고서] ${getFacilityTypeLabel(randomFacilityType)}에 새로운 손상이 발견되었습니다. 손상 정도: ${getDamageSeverityLabel(randomDamageSeverity)}.`,
-  //       acknowledged: false,
-  //       isAugmented: Math.random() > 0.5, // New reports can also be augmented
-  //     };
-  //   };
+    const updatedAllReportsList = [newReport, ...allReportsRef.current];
+    setAllReports(updatedAllReportsList);
 
-  //   const intervalId = setInterval(() => {
-  //     if (allReportsRef.current.length >= 25) { 
-  //       return;
-  //     }
+    // Re-apply current client-side filters to the updated list
+    let currentlyDisplayed = [...updatedAllReportsList];
+    if (currentFiltersRef.current.model === 'YOLOv8') {
+        currentlyDisplayed = currentlyDisplayed.filter(r => !r.isAugmented);
+    }
+    // Apply other filters (facility, severity, acknowledged)
+    currentlyDisplayed = currentlyDisplayed.filter(report => {
+        const facilityMatch = currentFiltersRef.current.facilityType === 'all' || report.facilityType === currentFiltersRef.current.facilityType;
+        const severityMatch = currentFiltersRef.current.damageSeverity === 'all' || report.damageSeverity === currentFiltersRef.current.damageSeverity;
+        let acknowledgedMatch = true;
+        if (currentFiltersRef.current.acknowledgedStatus !== 'all') {
+            acknowledgedMatch = currentFiltersRef.current.acknowledgedStatus === 'acknowledged' ? report.acknowledged : !report.acknowledged;
+        }
+        return facilityMatch && severityMatch && acknowledgedMatch;
+    });
+    setDisplayedReports(currentlyDisplayed);
 
-  //     const newReport = generateNewDamageReport(allReportsRef.current.length);
-      
-  //     const updatedAllReportsList = [newReport, ...allReportsRef.current];
-  //     setAllReports(updatedAllReportsList);
-      
-  //     // Re-apply current client-side filters to the updated list, including model filter
-  //     let currentlyDisplayed = updatedAllReportsList;
-  //     if (currentFiltersRef.current.model === 'YOLOv8') {
-  //         currentlyDisplayed = currentlyDisplayed.filter(r => !r.isAugmented);
-  //     }
-  //     currentlyDisplayed = currentlyDisplayed.filter(report => {
-  //       const facilityMatch = currentFiltersRef.current.facilityType === 'all' || report.facilityType === currentFiltersRef.current.facilityType;
-  //       const severityMatch = currentFiltersRef.current.damageSeverity === 'all' || report.damageSeverity === currentFiltersRef.current.damageSeverity;
-  //       let acknowledgedMatch = true;
-  //       if (currentFiltersRef.current.acknowledgedStatus !== 'all') {
-  //           acknowledgedMatch = currentFiltersRef.current.acknowledgedStatus === 'acknowledged' ? report.acknowledged : !report.acknowledged;
-  //       }
-  //       return facilityMatch && severityMatch && acknowledgedMatch;
-  //     });
-  //     setDisplayedReports(currentlyDisplayed);
+    toast({
+      title: "✅ 새 보고서 추가됨",
+      description: `ID ${newReport.id} (${getFacilityTypeLabel(newReport.facilityType)}) 보고서가 목록에 추가되었습니다.`,
+      variant: "success",
+    });
+  };
 
-  //     toast({
-  //       title: "✨ 새로운 보고서 추가됨",
-  //       description: `ID ${newReport.id} (${getFacilityTypeLabel(newReport.facilityType)}) 보고서가 목록에 추가되었습니다.`,
-  //       variant: "success",
-  //     });
-  //   }, 15000); 
-
-  //   return () => clearInterval(intervalId);
-  // }, [toast]);
 
   const handleAcknowledge = (id: string) => {
     const updatedAllReports = allReportsRef.current.map(report =>
@@ -138,7 +127,6 @@ export default function HomePage() {
     );
     setAllReports(updatedAllReports);
 
-    // Re-apply all current filters after acknowledging
     let currentlyDisplayed = [...updatedAllReports];
     if (currentFiltersRef.current.model === 'YOLOv8') {
         currentlyDisplayed = currentlyDisplayed.filter(r => !r.isAugmented);
@@ -168,7 +156,6 @@ export default function HomePage() {
     );
     setAllReports(updatedAllReports);
     
-    // Re-apply all current filters after severity change
     let currentlyDisplayed = [...updatedAllReports];
      if (currentFiltersRef.current.model === 'YOLOv8') {
         currentlyDisplayed = currentlyDisplayed.filter(r => !r.isAugmented);
@@ -246,13 +233,10 @@ export default function HomePage() {
       );
     }
 
-    // Apply model filter
     if (modelFilter === 'YOLOv8') {
       reportsForFurtherFiltering = reportsForFurtherFiltering.filter(report => !report.isAugmented);
     }
-    // YOLOv12 shows all augmented/non-augmented
 
-    // Apply acknowledged status filter
     const finalFilteredReports = reportsForFurtherFiltering.filter(report => {
       if (acknowledgedStatusFilter === 'all') return true;
       return acknowledgedStatusFilter === 'acknowledged' ? report.acknowledged : !report.acknowledged;
@@ -284,11 +268,10 @@ export default function HomePage() {
     } as const;
     setCurrentFilters(resetSettings);
 
-    let reportsToDisplay = [...allReports];
-    if (defaultModel === 'YOLOv8') { // Apply default model logic
+    let reportsToDisplay = [...allReportsRef.current]; // Use ref for reset to get latest full list
+    if (defaultModel === 'YOLOv8') { 
       reportsToDisplay = reportsToDisplay.filter(report => !report.isAugmented);
     }
-    // Other filters (facility, severity, acknowledged) are 'all', so no further filtering.
     setDisplayedReports(reportsToDisplay);
     toast({ title: "필터 초기화됨", description: `모든 필터가 초기화되고 ${getModelLabel(defaultModel)} 모델이 선택되었습니다.`, variant: "default" });
   };
@@ -325,6 +308,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
+      <ImageUploadForm onImageUpload={handleImageUpload} />
       <DamageFilter onFilter={handleFilter} onReset={handleResetFilters} isLoading={isFiltering} />
       
       {isFiltering && (
