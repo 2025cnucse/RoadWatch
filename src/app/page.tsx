@@ -37,6 +37,19 @@ export default function HomePage() {
       variant: "success",
     });
   };
+
+  const handleSeverityChange = (id: string, newSeverity: DamageSeverity) => {
+    const updateInList = (list: DamageReport[]) => list.map(report =>
+      report.id === id ? { ...report, damageSeverity: newSeverity } : report
+    );
+    setAllReports(prev => updateInList(prev));
+    setDisplayedReports(prev => updateInList(prev));
+    toast({
+      title: "Severity Updated",
+      description: `Report ID ${id} severity changed to ${newSeverity}.`,
+      variant: "default",
+    });
+  };
   
   const imageIdsForAI = useMemo(() => allReports.map(report => report.id), [allReports]);
 
@@ -50,8 +63,6 @@ export default function HomePage() {
       return;
     }
     
-    // If AI filtering is not needed (one or both filters are 'all' but not both)
-    // or if we prefer client-side filtering for simple cases
     if (facilityType === 'all' || damageSeverity === 'all') {
         const clientFiltered = allReports.filter(report => {
             const facilityMatch = facilityType === 'all' || report.facilityType === facilityType;
@@ -64,11 +75,10 @@ export default function HomePage() {
         return;
     }
 
-    // Use AI for specific filtering
     try {
       const result = await filterDamageImages({
-        facilityType: facilityType as FacilityType, // Cast because 'all' is handled
-        damageSeverity: damageSeverity as DamageSeverity, // Cast because 'all' is handled
+        facilityType: facilityType as FacilityType,
+        damageSeverity: damageSeverity as DamageSeverity,
         imageIds: imageIdsForAI,
       });
 
@@ -88,7 +98,6 @@ export default function HomePage() {
         description: "Could not filter images using AI. Please try again. Displaying all reports.",
         variant: "destructive",
       });
-      // Fallback to showing all reports or previous state if error occurs
       setDisplayedReports(allReports); 
     } finally {
       setIsFiltering(false);
@@ -147,7 +156,12 @@ export default function HomePage() {
       {!isFiltering && displayedReports.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {displayedReports.map(report => (
-            <DamageReportCard key={report.id} report={report} onAcknowledge={handleAcknowledge} />
+            <DamageReportCard 
+              key={report.id} 
+              report={report} 
+              onAcknowledge={handleAcknowledge}
+              onSeverityChange={handleSeverityChange} 
+            />
           ))}
         </div>
       )}

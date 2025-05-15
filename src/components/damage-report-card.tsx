@@ -3,18 +3,36 @@
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge, type BadgeProps } from '@/components/ui/badge'; // Added BadgeProps type
 import type { DamageReport, DamageSeverity } from '@/types';
 import { FacilityIcon } from '@/components/icons';
 import { CheckCircle2, AlertCircle, CalendarDays, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { damageSeverities } from '@/lib/constants';
 
 interface DamageReportCardProps {
   report: DamageReport;
   onAcknowledge: (id: string) => void;
+  onSeverityChange: (id: string, newSeverity: DamageSeverity) => void;
 }
 
-const getSeverityBadgeVariant = (severity: DamageSeverity): VariantProps<typeof Badge>['variant'] => {
+const getSeverityBadgeVariant = (severity: DamageSeverity): BadgeProps['variant'] => {
   switch (severity) {
     case 'High':
       return 'destructive';
@@ -38,7 +56,7 @@ const getAiHint = (facilityType: DamageReport['facilityType']): string => {
   }
 }
 
-export function DamageReportCard({ report, onAcknowledge }: DamageReportCardProps) {
+export function DamageReportCard({ report, onAcknowledge, onSeverityChange }: DamageReportCardProps) {
   return (
     <Card className={`flex flex-col h-full shadow-lg transition-all duration-300 hover:shadow-xl ${report.acknowledged ? 'opacity-70 bg-secondary/30' : 'bg-card'}`}>
       <CardHeader className="pb-3">
@@ -49,17 +67,36 @@ export function DamageReportCard({ report, onAcknowledge }: DamageReportCardProp
           </CardTitle>
           <Badge variant={getSeverityBadgeVariant(report.damageSeverity)}>{report.damageSeverity}</Badge>
         </div>
-         <div className="relative w-full h-48 rounded-md overflow-hidden border">
-            <Image
-              src={report.imageUrl}
-              alt={`Damage at ${report.location} - ${report.facilityType}`}
-              layout="fill"
-              objectFit="cover"
-              data-ai-hint={getAiHint(report.facilityType)}
-            />
-          </div>
+         <Dialog>
+          <DialogTrigger asChild>
+            <div className="relative w-full h-48 rounded-md overflow-hidden border cursor-pointer">
+              <Image
+                src={report.imageUrl}
+                alt={`Damage at ${report.location} - ${report.facilityType}`}
+                layout="fill"
+                objectFit="cover"
+                data-ai-hint={getAiHint(report.facilityType)}
+              />
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[80vw] md:max-w-[70vw] lg:max-w-[60vw] xl:max-w-[50vw] p-0">
+            <DialogHeader className="p-4 border-b flex flex-row items-center justify-between">
+              <DialogTitle>Image Detail - {report.facilityType} at {report.location}</DialogTitle>
+              <DialogClose />
+            </DialogHeader>
+            <div className="p-4 max-h-[80vh] overflow-auto">
+              <Image
+                src={report.imageUrl}
+                alt={`Detailed view - Damage at ${report.location} - ${report.facilityType}`}
+                width={1200}
+                height={800}
+                className="rounded-md object-contain w-full h-auto"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardHeader>
-      <CardContent className="flex-grow space-y-3 pt-0">
+      <CardContent className="flex-grow space-y-3 pt-4">
         <div className="text-xs text-muted-foreground space-y-1">
             <div className="flex items-center">
                 <MapPin className="mr-2 h-3.5 w-3.5" />
@@ -73,6 +110,26 @@ export function DamageReportCard({ report, onAcknowledge }: DamageReportCardProp
         <CardDescription className="text-sm leading-relaxed line-clamp-3">
           {report.description}
         </CardDescription>
+        
+        <div className="space-y-1 pt-2">
+          <Label htmlFor={`severity-select-${report.id}`} className="text-xs font-medium text-muted-foreground">
+            Change Severity:
+          </Label>
+          <Select
+            value={report.damageSeverity}
+            onValueChange={(newSeverity) => onSeverityChange(report.id, newSeverity as DamageSeverity)}
+            disabled={report.acknowledged}
+          >
+            <SelectTrigger id={`severity-select-${report.id}`} className="h-9">
+              <SelectValue placeholder="Select severity" />
+            </SelectTrigger>
+            <SelectContent>
+              {damageSeverities.map(severity => (
+                <SelectItem key={severity} value={severity}>{severity}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardContent>
       <CardFooter>
         <Button
