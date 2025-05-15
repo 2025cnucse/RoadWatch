@@ -70,8 +70,7 @@ export default {
   			}
   		},
   		fontFamily: {
-        sans: ["var(--font-geist-sans)"],
-        mono: ["var(--font-geist-mono)"],
+        sans: ["var(--font-inter)"],
       },
   		borderRadius: {
   			lg: 'var(--radius)',

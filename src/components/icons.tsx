@@ -1,5 +1,5 @@
 import type { FacilityType } from '@/types';
-import { Building2, Road, Signpost, TrafficCone, ShieldAlert, HelpCircle, type LucideProps } from 'lucide-react';
+import { Building2, Route, Signpost, TrafficCone, ShieldAlert, HelpCircle, type LucideProps } from 'lucide-react';
 
 interface FacilityIconProps extends LucideProps {
   type: FacilityType;
@@ -10,7 +10,7 @@ export function FacilityIcon({ type, ...props }: FacilityIconProps) {
     case 'Bridge':
       return <Building2 {...props} />;
     case 'Road':
-      return <Road {...props} />;
+      return <Route {...props} />;
     case 'Sign':
       return <Signpost {...props} />;
     case 'Traffic Light':

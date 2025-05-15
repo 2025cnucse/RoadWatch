@@ -8,6 +8,7 @@ import { DamageReportCard } from '@/components/damage-report-card';
 import { filterDamageImages } from '@/ai/flows/filter-damage-images';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { AlertTriangle, SearchX } from 'lucide-react';
 
 export default function HomePage() {
