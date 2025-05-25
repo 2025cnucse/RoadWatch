@@ -35,6 +35,7 @@ export default function MapPage() {
 
     try {
       // 🔶 Polygon 표시
+
       const res = await fetch('/sig.json');
       const geojson = await res.json();
 
@@ -42,7 +43,9 @@ export default function MapPage() {
         const coords = feature.geometry.coordinates;
         const name = feature.properties?.SIG_KOR_NM || 'unknown';
         const code = feature.properties?.SIG_CD || '';
+
         const isTarget = code === '30200';
+
 
         const polygons: window.kakao.maps.LatLng[][] = [];
 
