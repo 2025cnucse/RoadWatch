@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -62,14 +61,6 @@ export default function HomePage() {
   const allReportsRef = useRef<DamageReport[]>(allReports);
   const currentFiltersRef = useRef(currentFilters);
 
-  // useEffect(() => {
-  //   allReportsRef.current = allReports;
-  // }, [allReports]);
-
-  // useEffect(() => {
-  //   currentFiltersRef.current = currentFilters;
-  // }, [currentFilters]);
-  
   useEffect(() => {
     setAllReports(mockDamageReports);
     let initialDisplay = [...mockDamageReports];
