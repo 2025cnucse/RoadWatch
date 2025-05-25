@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 declare global {
   interface Window {
@@ -10,6 +11,7 @@ declare global {
 
 export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -26,7 +28,7 @@ export default function MapPage() {
     if (!container) return;
 
     const map = new window.kakao.maps.Map(container, {
-      center: new window.kakao.maps.LatLng(36.35, 127.38), // 대전 중심
+      center: new window.kakao.maps.LatLng(36.35, 127.38),
       level: 9,
     });
 
@@ -36,8 +38,11 @@ export default function MapPage() {
 
       geojson.features.forEach((feature: any) => {
         const coords = feature.geometry.coordinates;
+        const name = feature.properties?.SIG_KOR_NM || 'unknown';
+        const code = feature.properties?.SIG_CD || '';
 
-        // Polygon과 MultiPolygon 처리
+        const isTarget = code === '30200'; 
+
         const polygons: window.kakao.maps.LatLng[][] = [];
 
         if (feature.geometry.type === 'Polygon') {
@@ -49,14 +54,33 @@ export default function MapPage() {
         }
 
         polygons.forEach(path => {
-          new window.kakao.maps.Polygon({
+          const polygon = new window.kakao.maps.Polygon({
             map,
             path,
             strokeWeight: 2,
             strokeColor: '#004c80',
             strokeOpacity: 0.8,
-            fillColor: '#fff',
+            fillColor: isTarget ? '#f08080' : '#fff',
             fillOpacity: 0.5,
+          });
+
+          // hover 시 색상 변경
+          window.kakao.maps.event.addListener(polygon, 'mouseover', () => {
+            polygon.setOptions({
+              fillColor: '#add8e6',
+              fillOpacity: 0.7,
+            });
+          });
+
+          window.kakao.maps.event.addListener(polygon, 'mouseout', () => {
+            polygon.setOptions({
+              fillColor: isTarget ? '#f08080' : '#fff', 
+              fillOpacity: 0.5,
+            });
+          });
+
+          window.kakao.maps.event.addListener(polygon, 'click', () => {
+            router.push(`/listPage?region=${encodeURIComponent(name)}`);
           });
         });
       });
