@@ -61,6 +61,17 @@ export default function HomePage() {
   const allReportsRef = useRef<DamageReport[]>(allReports);
   const currentFiltersRef = useRef(currentFilters);
 
+  // allReports 상태가 바뀔 때마다 ref.current 에도 동기화
+  useEffect(() => {
+    allReportsRef.current = allReports;
+  }, [allReports]);
+
+  // currentFilters 상태가 바뀔 때마다 ref.current 에도 동기화
+  useEffect(() => {
+    currentFiltersRef.current = currentFilters;
+  }, [currentFilters]);
+
+
   useEffect(() => {
     setAllReports(mockDamageReports);
     let initialDisplay = [...mockDamageReports];
