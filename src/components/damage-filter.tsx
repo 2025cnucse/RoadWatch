@@ -18,13 +18,21 @@ interface DamageFilterProps {
   ) => void;
   onReset: () => void;
   isLoading: boolean;
+
+  // initialValues: {
+  //   facilityType: FacilityType | 'all';
+  //   damageSeverity: DamageSeverity | 'all';
+  //   acknowledgedStatus: AcknowledgedStatus;
+  //   model: ModelType;
+  // };
 }
+
 
 export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps) {
   const [facilityType, setFacilityType] = useState<FacilityType | 'all'>('all');
   const [damageSeverity, setDamageSeverity] = useState<DamageSeverity | 'all'>('all');
-  const [acknowledgedStatus, setAcknowledgedStatus] = useState<AcknowledgedStatus>('all');
-  const [selectedModel, setSelectedModel] = useState<ModelType>('YOLOv12'); // Default to augmented model
+  const [acknowledgedStatus, setAcknowledgedStatus] = useState<AcknowledgedStatus>('unacknowledged');
+  const [selectedModel, setSelectedModel] = useState<ModelType>('YOLOv8'); // Default to augmented model
 
   const handleFilter = () => {
     onFilter(facilityType, damageSeverity, acknowledgedStatus, selectedModel);
@@ -34,7 +42,7 @@ export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps
     setFacilityType('all');
     setDamageSeverity('all');
     setAcknowledgedStatus('all');
-    setSelectedModel('YOLOv12'); // Reset to default model
+    setSelectedModel('YOLOv8'); // Reset to default model
     onReset();
   }
 

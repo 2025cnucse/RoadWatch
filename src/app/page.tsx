@@ -3,43 +3,16 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
 
 export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=a42968a24e434cf08183dbf676af5036&autoload=false`;
-    script.async = true;
-    script.onload = () => {
-      window.kakao.maps.load(() => initMap());
-    };
-    document.head.appendChild(script);
-  }, []);
-
-  const initMap = async () => {
-    const container = mapRef.current;
-    if (!container) return;
 
     const map = new window.kakao.maps.Map(container, {
       center: new window.kakao.maps.LatLng(36.35, 127.38),
       level: 9,
     });
-
-    try {
-      const res = await fetch('/sig.json');
-      const geojson = await res.json();
-
-      geojson.features.forEach((feature: any) => {
-        const coords = feature.geometry.coordinates;
-        const name = feature.properties?.SIG_KOR_NM || 'unknown';
-        const code = feature.properties?.SIG_CD || '';
 
         const isTarget = code === '30200'; 
 
