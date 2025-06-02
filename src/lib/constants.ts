@@ -1,4 +1,4 @@
-import type { FacilityType, DamageSeverity, AcknowledgedStatus, ModelType } from '@/types';
+import type { FacilityType, DamageSeverity, AcknowledgedStatus } from '@/types';
 
 export const facilityTypes: { value: FacilityType; label: string }[] = [
   { value: "Bridge", label: "교량" },
@@ -19,9 +19,4 @@ export const acknowledgedStatusOptions: { value: AcknowledgedStatus; label: stri
   { value: "all", label: "모든 상태" },
   { value: "acknowledged", label: "확인됨" },
   { value: "unacknowledged", label: "미확인" },
-];
-
-export const modelOptions: { value: ModelType; label: string }[] = [
-  { value: "YOLOv12", label: "YOLOv12 (증강 모델)" },
-  { value: "YOLOv8", label: "YOLOv8 (기존 모델)" },
 ];
