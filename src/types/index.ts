@@ -12,4 +12,7 @@ export interface DamageReport {
   location: string;
   description: string;
   acknowledged: boolean;
+  lat: number;
+  lng: number;
+  importance: string;
 }

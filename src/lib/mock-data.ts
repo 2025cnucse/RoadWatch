@@ -1,29 +1,4 @@
-  // import type { DamageReport, FacilityType, DamageSeverity } from '@/types';
-
-  // const facilityTypes: FacilityType[] = ["Bridge", "Road", "Sign", "Traffic Light", "Guardrail", "Other"];
-  // const damageSeverities: DamageSeverity[] = ["Low", "Medium", "High"];
-
-  // const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-
-  // export const mockDamageReports: DamageReport[] = Array.from({ length: 12 }, (_, i) => {
-  //   const facilityType = getRandomElement(facilityTypes);
-  //   const damageSeverity = getRandomElement(damageSeverities);
-  //   const id = `report-${i + 1}`;
-  //   return {
-  //     id,
-  //     facilityType,
-  //     damageSeverity,
-  //     imageUrl: `https://placehold.co/${600 + i * 10}x${400 + i * 5}.png`,
-  //     gcsUrl: `gs://roadwatch-bucket/${id}.jpg`, // Example GCS URL
-  //     timestamp: new Date(Date.now() - Math.random() * 1000 * 60 * 60 * 24 * 30), // Random time in last 30 days
-  //     location: `Location ${String.fromCharCode(65 + i)}, Sector ${i % 3 + 1}`,
-  //     description: `Damage observed on ${facilityType.toLowerCase()} at location. Severity assessed as ${damageSeverity.toLowerCase()}. Issue requires attention. Example description text to fill space.`,
-  //     acknowledged: Math.random() > 0.7, // ~30% acknowledged
-  //     isAugmented: i % 2 === 0, // Roughly half of the reports are marked as augmented
-  //   };
-  // });
-
-  import type { DamageReport } from '@/types';
+import type { DamageReport } from '@/types';
 
   export const mockDamageReports: DamageReport[] = [
     {
@@ -35,7 +10,9 @@
       location: '대전시 유성구',
       description: '도로에 포트홀 발생',
       acknowledged: false,
-      isAugmented: false,
+      "lat": 36.3651,
+      "lng": 127.3552,
+      "importance": "middle"
     },
     {
       id: 'r002',
@@ -46,7 +23,9 @@
       location: '대전시 유성구',
       description: '도로에 균열 발생',
       acknowledged: false,
-      isAugmented: false,
+      lat: 36.3627,
+      lng: 127.3513,
+      importance: "low"
     },
     {
       id: 'r003',
@@ -57,7 +36,10 @@
       location: '대전시 유성구',
       description: '도로에 포트홀 발생',
       acknowledged: false,
-      isAugmented: false,
+      lat: 36.3627,
+      lng: 127.3510,
+      importance: "low"
+
     },
     {
       id: 'r004',
@@ -68,7 +50,9 @@
       location: '대전시 유성구',
       description: '',
       acknowledged: false,
-      isAugmented: true,  // 증강 데이터
+      lat: 36.3610,
+      lng: 127.3531,
+      importance: "low"
     },
     {
       id: 'r005',
@@ -79,7 +63,9 @@
       location: '대전시 유성구',
       description: '',
       acknowledged: false,
-      isAugmented: true,  // 증강 데이터
+      lat: 36.3650,
+      lng: 127.3531,
+      importance: "low"
     },
     {
       id: 'r006',
@@ -90,6 +76,8 @@
       location: '대전시 유성구',
       description: '',
       acknowledged: false,
-      isAugmented: true,  // 증강 데이터
+      lat: 36.3620,
+      lng: 127.3531,
+      importance: "low"
     },
   ];

@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import type { MarkerData } from '@/components/ReportModal';
+import { mockDamageReports } from '@/lib/mock-data';
 
 declare global {
   interface Window {
@@ -9,14 +11,17 @@ declare global {
   }
 }
 
+const ReportModal = dynamic(() => import('@/components/ReportModal'), { ssr: false });
+
 export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
 
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
-      '//dapi.kakao.com/v2/maps/sdk.js?appkey=a42968a24e434cf08183dbf676af5036&autoload=false&libraries=clusterer';
+      '//dapi.kakao.com/v2/maps/sdk.js?appkey=a42968a24e434cf08183dbf676af5036&autoload=false';
     script.async = true;
     script.onload = () => {
       window.kakao.maps.load(() => initMap());
@@ -39,9 +44,7 @@ export default function MapPage() {
 
       geojson.features.forEach((feature: any) => {
         const coords = feature.geometry.coordinates;
-        const name = feature.properties?.SIG_KOR_NM || 'unknown';
         const code = feature.properties?.SIG_CD || '';
-
         const isTarget = code === '30200';
 
         const polygons: window.kakao.maps.LatLng[][] = [];
@@ -81,39 +84,57 @@ export default function MapPage() {
               fillOpacity: 0.7,
             });
           });
+
           window.kakao.maps.event.addListener(polygon, 'mouseout', () => {
             polygon.setOptions({
               fillColor: isTarget ? '#f08080' : '#fff',
               fillOpacity: 0.5,
             });
           });
-
         });
       });
-      const imageRes = await fetch('/images.json');
-      const imageData = await imageRes.json();
 
-      const markers = imageData.map(
-        (item: { name: string; lat: number; lng: number; district: string }) => {
-          const marker = new window.kakao.maps.Marker({
-            position: new window.kakao.maps.LatLng(item.lat, item.lng),
-            title: item.district,
+      mockDamageReports.forEach((item) => {
+        let markerImageUrl = '/marker-default.png';
+        if (item.importance === 'high') markerImageUrl = '/red-dot.png';
+        else if (item.importance === 'middle') markerImageUrl = '/yellow-dot.png';
+        else if (item.importance === 'low') markerImageUrl = '/green-dot.png';
+
+        const markerImage = new window.kakao.maps.MarkerImage(
+          markerImageUrl,
+          new window.kakao.maps.Size(35, 35)
+        );
+
+        const marker = new window.kakao.maps.Marker({
+          map,
+          position: new window.kakao.maps.LatLng(item.lat, item.lng),
+          title: item.location,
+          image: markerImage,
+        });
+
+        window.kakao.maps.event.addListener(marker, 'click', () => {
+          setSelectedMarker({
+            name: item.id,
+            district: item.location,
+            lat: item.lat,
+            lng: item.lng,
           });
-
-          return { marker, district: item.district };
-        }
-      );  
-      const clusterer = new window.kakao.maps.MarkerClusterer({
-        map: map,
-        averageCenter: true,
-        minLevel: 1,
+          setModalOpen(true);
+        });
       });
-
-      clusterer.addMarkers(markers.map((m) => m.marker));
     } catch (error) {
-      console.error('GeoJSON 또는 마커 로딩 실패:', error);
+      console.error('지도 초기화 또는 마커 로딩 중 오류 발생:', error);
     }
   };
 
-  return <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />;
+  return (
+    <>
+      <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
+      <ReportModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        marker={selectedMarker}
+      />
+    </>
+  );
 }

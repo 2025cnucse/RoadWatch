@@ -3,30 +3,36 @@
     "name": "유성구보건소",
     "lat": 36.3651,
     "lng": 127.3552,
-    "district": "유성구"
+    "district": "유성구",
+    "importance": "middle"
   },
   {
     "name": "유성온천역",
     "lat": 36.3627,
     "lng": 127.3531,
-    "district": "유성구"
+    "district": "유성구",
+    "importance": "low"
   },
   {
     "name": "충남대학교",
     "lat": 36.3689,
     "lng": 127.3447,
-    "district": "유성구"
+    "district": "유성구",
+    "importance": "high"
   },
   {
     "name": "유성시장",
     "lat": 36.3612,
     "lng": 127.3575,
-    "district": "유성구"
+    "district": "유성구",
+    "importance": "high"
+    
   },
   {
     "name": "대전과학기술고등학교",
     "lat": 36.3702,
     "lng": 127.3496,
-    "district": "유성구"
+    "district": "유성구",
+    "importance": "high"
   }
 ]
