@@ -15,4 +15,5 @@ export interface DamageReport {
   lat: number;
   lng: number;
   importance: string;
+  isReviewed?: boolean;
 }
