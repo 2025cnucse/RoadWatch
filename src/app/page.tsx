@@ -26,7 +26,7 @@ export default function MapPage() {
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
-      '//dapi.kakao.com/v2/maps/sdk.js?appkey=b9aa4451b97483c16c248b666965b376&autoload=false';
+      '//dapi.kakao.com/v2/maps/sdk.js?appkey=bcb988d7f31bf0c78599c87b7c852005&autoload=false';
     script.async = true;
     script.onload = () => {
       window.kakao.maps.load(() => initMap(currentDamageReports)); // 초기 로드 시 데이터 전달
@@ -143,27 +143,6 @@ export default function MapPage() {
               fillColor: isTarget ? '#f08080' : '#fff',
               fillOpacity: 0.5,
             });
-          });
-
-          window.kakao.maps.event.addListener(polygon, 'click', () => {
-              // 폴리곤 클릭 시 해당 지역에 해당하는 마커 정보를 찾아서 모달에 전달
-              const relatedReport = currentDamageReports.find(report => report.location.includes('유성구')); // 더 정교한 매칭 필요
-              if (relatedReport) {
-                  setSelectedMarker({
-                      name: relatedReport.id,
-                      district: relatedReport.location,
-                      lat: relatedReport.lat,
-                      lng: relatedReport.lng,
-                      imageUrl: relatedReport.imageUrl,
-                      description: relatedReport.description,
-                      facilityType: relatedReport.facilityType,
-                      damageSeverity: relatedReport.damageSeverity,
-                      timestamp: relatedReport.timestamp,
-                  });
-                  setModalOpen(true);
-              } else {
-                  alert(`${feature.properties.SIG_KOR_NM || '알 수 없는 지역'}을 클릭했습니다.`);
-              }
           });
         });
       });
