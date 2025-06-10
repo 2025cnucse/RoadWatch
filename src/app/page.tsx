@@ -16,7 +16,7 @@ export default function MapPage() {
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
-      '//dapi.kakao.com/v2/maps/sdk.js?appkey=bcb988d7f31bf0c78599c87b7c852005&autoload=false&libraries=clusterer';
+      '//dapi.kakao.com/v2/maps/sdk.js?appkey=a42968a24e434cf08183dbf676af5036&autoload=false&libraries=clusterer';
     script.async = true;
     script.onload = () => {
       window.kakao.maps.load(() => initMap());
@@ -34,8 +34,6 @@ export default function MapPage() {
     });
 
     try {
-      // 🔶 Polygon 표시
-
       const res = await fetch('/sig.json');
       const geojson = await res.json();
 
@@ -46,20 +44,21 @@ export default function MapPage() {
 
         const isTarget = code === '30200';
 
-
         const polygons: window.kakao.maps.LatLng[][] = [];
 
         if (feature.geometry.type === 'Polygon') {
           polygons.push(
             coords[0].map(
-              (coord: number[]) => new window.kakao.maps.LatLng(coord[1], coord[0])
+              (coord: number[]) =>
+                new window.kakao.maps.LatLng(coord[1], coord[0])
             )
           );
         } else if (feature.geometry.type === 'MultiPolygon') {
           coords.forEach((polygon: number[][][]) => {
             polygons.push(
               polygon[0].map(
-                (coord: number[]) => new window.kakao.maps.LatLng(coord[1], coord[0])
+                (coord: number[]) =>
+                  new window.kakao.maps.LatLng(coord[1], coord[0])
               )
             );
           });
@@ -82,7 +81,6 @@ export default function MapPage() {
               fillOpacity: 0.7,
             });
           });
-
           window.kakao.maps.event.addListener(polygon, 'mouseout', () => {
             polygon.setOptions({
               fillColor: isTarget ? '#f08080' : '#fff',
@@ -90,13 +88,8 @@ export default function MapPage() {
             });
           });
 
-          window.kakao.maps.event.addListener(polygon, 'click', () => {
-            router.push(`/listPage?region=${encodeURIComponent(name)}`);
-          });
         });
       });
-
-      // 🔷 마커 생성
       const imageRes = await fetch('/images.json');
       const imageData = await imageRes.json();
 
@@ -104,34 +97,19 @@ export default function MapPage() {
         (item: { name: string; lat: number; lng: number; district: string }) => {
           const marker = new window.kakao.maps.Marker({
             position: new window.kakao.maps.LatLng(item.lat, item.lng),
-            title: item.district, // ✅ 구 이름으로 설정
+            title: item.district,
           });
 
           return { marker, district: item.district };
         }
-      );
-
-      // 🔷 클러스터러 생성
+      );  
       const clusterer = new window.kakao.maps.MarkerClusterer({
         map: map,
         averageCenter: true,
         minLevel: 1,
-        disableClickZoom: true,
       });
 
       clusterer.addMarkers(markers.map((m) => m.marker));
-
-      window.kakao.maps.event.addListener(
-        clusterer,
-        'clusterclick',
-        (cluster: any) => {
-          const clusterMarkers = cluster.getMarkers();
-          if (clusterMarkers.length > 0) {
-            const district = clusterMarkers[0].getTitle();
-            router.push(`/listPage?region=${encodeURIComponent(district)}`);
-          }
-        }
-      );
     } catch (error) {
       console.error('GeoJSON 또는 마커 로딩 실패:', error);
     }
