@@ -16,7 +16,7 @@ export default function MapPage() {
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
-      '//dapi.kakao.com/v2/maps/sdk.js?appkey=a42968a24e434cf08183dbf676af5036&autoload=false&libraries=clusterer';
+      '//dapi.kakao.com/v2/maps/sdk.js?appkey=bcb988d7f31bf0c78599c87b7c852005&autoload=false&libraries=clusterer';
     script.async = true;
     script.onload = () => {
       window.kakao.maps.load(() => initMap());
