@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-// 마커의 상세 데이터를 담는 타입 정의 (이전에 추가된 속성 포함)
+// 마커의 상세 데이터를 담는 타입 정의 (동일)
 export interface MarkerData {
   name: string; // id로 사용
   district: string;
@@ -12,7 +12,7 @@ export interface MarkerData {
   imageUrl?: string;
   description?: string;
   facilityType?: string;
-  damageSeverity?: 'Low' | 'Medium' | 'High'; // 훼손도 타입 명확화
+  damageSeverity?: 'Low' | 'Medium' | 'High';
   timestamp?: Date;
 }
 
@@ -25,75 +25,110 @@ interface ReportModalProps {
   onUpdateSeverity: (markerId: string, newSeverity: 'Low' | 'Medium' | 'High') => void;
 }
 
-const damageSeverities = ['Low', 'Medium', 'High']; // 드롭다운에 표시할 훼손도 옵션
+const damageSeverities = ['Low', 'Medium', 'High'];
 
 export default function ReportModal({ isOpen, onClose, marker, onUpdateSeverity }: ReportModalProps) {
   if (!isOpen || !marker) return null;
 
   // 현재 선택된 훼손도 상태를 관리
-  const [currentSeverity, setCurrentSeverity] = React.useState(marker.damageSeverity || 'Low');
+  const [tempSeverity, setTempSeverity] = React.useState(marker.damageSeverity || 'Low'); // 임시 훼손도 상태
 
-  // 모달이 열릴 때마다 marker prop의 damageSeverity를 currentSeverity로 업데이트
+  // 모달이 열릴 때마다 marker prop의 damageSeverity를 tempSeverity로 초기화
   React.useEffect(() => {
     if (marker?.damageSeverity) {
-      setCurrentSeverity(marker.damageSeverity);
+      setTempSeverity(marker.damageSeverity);
     }
   }, [marker?.damageSeverity]);
 
-  const handleSeverityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newSeverity = event.target.value as 'Low' | 'Medium' | 'High';
-    setCurrentSeverity(newSeverity); // UI 상태 업데이트
-    // 부모 컴포넌트로 변경된 훼손도 전달 (mockDamageReports 업데이트용)
+    setTempSeverity(newSeverity); // 드롭다운 변경 시에는 임시 상태만 업데이트
+  };
+
+  const handleConfirmChange = () => {
+    // '확인' 버튼 클릭 시에만 부모 컴포넌트로 변경 사항 전달
     if (marker) {
-      onUpdateSeverity(marker.name, newSeverity); // marker.name은 id로 사용되고 있습니다.
+      onUpdateSeverity(marker.name, tempSeverity);
     }
+    onClose(); // 변경 사항을 전달한 후 모달 닫기
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <div style={{ background: 'white', padding: '20px', borderRadius: '8px', maxWidth: '400px', minWidth: '300px' }}>
-        <h2>📍 {marker.district}</h2>
-        <p><strong>장소 이름:</strong> {marker.name}</p>
-        {marker.facilityType && <p><strong>시설물 유형:</strong> {marker.facilityType}</p>}
-        <p>
-          <strong>손상 심각도:</strong>
-          <select value={currentSeverity} onChange={handleSeverityChange} style={{ marginLeft: '10px', padding: '5px' }}>
-            {damageSeverities.map((severityOption) => (
-              <option key={severityOption} value={severityOption}>
-                {severityOption}
-              </option>
-            ))}
-          </select>
-        </p>
-        <p><strong>위도:</strong> {marker.lat}</p>
-        <p><strong>경도:</strong> {marker.lng}</p>
-        {marker.description && <p><strong>설명:</strong> {marker.description}</p>}
-        {marker.timestamp && <p><strong>보고 시간:</strong> {marker.timestamp.toLocaleString()}</p>}
+    // 모달 배경 (어둡게 처리된 오버레이)
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      {/* 모달 내용 컨테이너 */}
+      <div
+        className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full relative overflow-hidden"
+      >
+        {/* 닫기 버튼 */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl z-10"
+          aria-label="모달 닫기"
+        >
+          &times;
+        </button>
 
+        {/* 상단 이미지 영역 */}
         {marker.imageUrl && (
-          <div style={{ marginTop: '15px' }}>
+          <div className="w-full h-48 bg-gray-200 overflow-hidden rounded-t-lg mb-4">
             <img
               src={marker.imageUrl}
               alt="손상 이미지"
-              style={{ maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
+              className="w-full h-full object-cover"
             />
           </div>
         )}
 
-        <button onClick={onClose} style={{ marginTop: '20px', padding: '8px 15px', cursor: 'pointer' }}>닫기</button>
+        {/* 모달 헤더 - 장소 이름 */}
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          {marker.district} ({marker.name})
+        </h2>
+
+        {/* 상세 정보 */}
+        <div className="text-sm text-gray-700 space-y-1">
+          {marker.facilityType && (
+            <p><strong>시설물 유형:</strong> {marker.facilityType}</p>
+          )}
+          <p className="flex items-center">
+            <strong>손상 심각도:</strong>
+            <select
+              value={tempSeverity} // 임시 상태 사용
+              onChange={handleDropdownChange} // 드롭다운 변경 핸들러
+              className="ml-2 px-2 py-1 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+            >
+              {damageSeverities.map((severityOption) => (
+                <option key={severityOption} value={severityOption}>
+                  {severityOption}
+                </option>
+              ))}
+            </select>
+          </p>
+          <p><strong>위도:</strong> {marker.lat.toFixed(6)}</p>
+          <p><strong>경도:</strong> {marker.lng.toFixed(6)}</p>
+          {marker.description && (
+            <p><strong>설명:</strong> {marker.description || '설명 없음'}</p>
+          )}
+          {marker.timestamp && (
+            <p><strong>보고 시간:</strong> {marker.timestamp.toLocaleString()}</p>
+          )}
+        </div>
+
+        {/* 하단 버튼 영역 */}
+        <div className="mt-6 flex justify-end space-x-3"> {/* 버튼 간격 추가 */}
+            <button
+                onClick={onClose} // 취소 버튼은 그냥 모달만 닫음
+                className="bg-gray-300 text-gray-800 px-5 py-2 rounded-md hover:bg-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+                취소
+            </button>
+            <button
+                onClick={handleConfirmChange} // 확인 버튼 클릭 시 변경사항 반영
+                className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+                확인
+            </button>
+        </div>
       </div>
     </div>
   );
