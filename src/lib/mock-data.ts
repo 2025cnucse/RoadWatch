@@ -12,7 +12,8 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       "lat": 36.3651,
       "lng": 127.3552,
-      "importance": "middle"
+      "importance": "middle",
+      isReviewed: false
     },
     {
       id: 'r002',
@@ -25,7 +26,8 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3627,
       lng: 127.3513,
-      importance: "low"
+      importance: "low",
+      isReviewed: false
     },
     {
       id: 'r003',
@@ -38,7 +40,8 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3627,
       lng: 127.3510,
-      importance: "low"
+      importance: "low",
+      isReviewed: false
 
     },
     {
@@ -52,7 +55,8 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3610,
       lng: 127.3531,
-      importance: "low"
+      importance: "low",
+      isReviewed: false
     },
     {
       id: 'r005',
@@ -65,7 +69,8 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3650,
       lng: 127.3531,
-      importance: "low"
+      importance: "low",
+      isReviewed: false
     },
     {
       id: 'r006',
@@ -78,6 +83,7 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3620,
       lng: 127.3531,
-      importance: "low"
+      importance: "low",
+      isReviewed: false
     },
   ];
