@@ -204,7 +204,7 @@ export default function ListPage() {
       toast({
         title: "다운로드할 데이터 없음",
         description: "현재 표시된 보고서가 없어 CSV 파일을 생성할 수 없습니다.",
-        variant: "warning",
+        variant: "default", // "warning" was changed to "default" to avoid error
       });
       return;
     }
@@ -251,60 +251,16 @@ export default function ListPage() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: "✅ CSV 다운로드 시작됨",
-        description: `${displayedReports.length}개의 보고서가 CSV 파일로 다운로드됩니다.`,
-        variant: "success",
-      });
     } else {
       toast({
-        title: "CSV 다운로드 실패",
-        description: "브라우저에서 파일 다운로드를 지원하지 않습니다.",
+        title: "다운로드 실패",
+        description: "현재 브라우저에서는 다운로드를 지원하지 않습니다.",
         variant: "destructive",
       });
     }
   };
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <Card className="mb-8">
-          <CardHeader>
-            <Skeleton className="h-8 w-1/3" />
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-1/3" />
-            </div>
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="flex flex-col h-full">
-              <CardHeader>
-                <Skeleton className="h-6 w-2/3 mb-2" />
-                <Skeleton className="w-full h-48" />
-              </CardHeader>
-              <CardContent className="flex-grow space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </CardContent>
-              <CardFooter>
-                <Skeleton className="h-10 w-full" />
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
+  // Component rendering
   return (
     <div className="space-y-8">
       {/* Download Button */}
@@ -317,19 +273,22 @@ export default function ListPage() {
 
       {/* Filter Component */}
       <DamageFilter onFilter={handleFilter} onReset={handleResetFilters} isLoading={isFiltering} />
-      
+
       {/* Loading State During Filtering */}
       {isFiltering && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: displayedReports.length || 6 }).map((_, i) => (
-            <Card key={`skeleton-filtering-${i}`} className="flex flex-col h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <Card key={index}>
               <CardHeader>
-                <Skeleton className="h-6 w-2/3 mb-2" />
-                <Skeleton className="w-full h-48" />
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-1/4" />
               </CardHeader>
-              <CardContent className="flex-grow space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
+              <CardContent>
+                <Skeleton className="w-full h-48 rounded-md" />
+                <div className="space-y-2 mt-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
               </CardContent>
               <CardFooter>
                 <Skeleton className="h-10 w-full" />
@@ -339,44 +298,60 @@ export default function ListPage() {
         </div>
       )}
 
-      {/* Report Cards */}
-      {!isFiltering && displayedReports.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {displayedReports.map(report => (
-            <DamageReportCard 
-              key={report.id} 
-              report={report} 
-              onAcknowledge={handleAcknowledge}
-              onSeverityChange={handleSeverityChange} 
-            />
-          ))}
-        </div>
+      {/* Main Content: Reports or Empty State */}
+      {!isFiltering && (
+        <>
+          {displayedReports.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {displayedReports.map(report => (
+                <DamageReportCard
+                  key={report.id}
+                  report={report}
+                  onAcknowledge={handleAcknowledge}
+                  onSeverityChange={handleSeverityChange}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="col-span-full flex flex-col items-center justify-center p-12 text-center">
+              <CardHeader>
+                <div className="mx-auto bg-secondary p-4 rounded-full">
+                  <SearchX className="h-12 w-12 text-muted-foreground" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <h3 className="text-xl font-semibold">검색 결과 없음</h3>
+                <p className="text-muted-foreground mt-2">
+                  현재 필터 조건에 맞는 손상 보고서가 없습니다. <br />
+                  필터 설정을 변경하거나 초기화 후 다시 시도해 주세요.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
 
-      {/* No Results State */}
-      {!isFiltering && displayedReports.length === 0 && allReports.length > 0 && (
-        <Card className="mt-8">
-          <CardContent className="pt-6 flex flex-col items-center justify-center text-center min-h-[300px]">
-            <SearchX className="h-16 w-16 text-muted-foreground mb-4" />
-            <h2 className="text-2xl font-semibold text-foreground mb-2">보고서 없음</h2>
-            <p className="text-muted-foreground">
-              현재 선택된 필터 조건에 맞는 손상 보고서가 없습니다. 필터 기준을 조정하거나 초기화해 보세요.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-      
-      {/* No Data State */}
-      {!isFiltering && allReports.length === 0 && !isLoading && (
-        <Card className="mt-8">
-          <CardContent className="pt-6 flex flex-col items-center justify-center text-center min-h-[300px]">
-            <AlertTriangle className="h-16 w-16 text-warning mb-4" />
-            <h2 className="text-2xl font-semibold text-foreground mb-2">손상 보고서 없음</h2>
-            <p className="text-muted-foreground">
-              시스템에 현재 손상 보고서가 없습니다. 새 보고서가 곧 추가될 수 있으니 잠시 후 다시 확인해주세요.
-            </p>
-          </CardContent>
-        </Card>
+      {/* Loading Skeleton on Initial Load */}
+      {isLoading && !isFiltering && (
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <Card key={index}>
+              <CardHeader>
+                <Skeleton className="h-4 w-2/3" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="w-full h-48 rounded-md" />
+                <div className="space-y-2 mt-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Skeleton className="h-10 w-full" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -14,6 +14,7 @@ export interface MarkerData {
   facilityType?: string;
   damageSeverity?: 'Low' | 'Medium' | 'High';
   timestamp?: Date;
+  isReviewed?: boolean;
 }
 
 interface ReportModalProps {
