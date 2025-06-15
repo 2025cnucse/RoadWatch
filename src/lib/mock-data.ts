@@ -40,7 +40,7 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3627,
       lng: 127.3510,
-      confidence: 59,
+      confidence: 44,
       isReviewed: false
 
     },
@@ -55,7 +55,7 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3610,
       lng: 127.3531,
-      confidence: 69,
+      confidence: 88,
       isReviewed: false
     },
     {
@@ -69,21 +69,35 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3650,
       lng: 127.3531,
-      confidence: 37,
+      confidence: 45,
       isReviewed: false
     },
-    // {
-    //   id: 'r006',
-    //   facilityType: 'Traffic Light',
-    //   damageSeverity: 'Medium',
-    //   imageUrl: '/images/rain1.jpg',
-    //   timestamp: new Date('2024-06-06T08:00:00'),
-    //   location: '대전시 유성구',
-    //   description: '',
-    //   acknowledged: false,
-    //   lat: 36.3620,
-    //   lng: 127.3531,
-    //   confidence: "low",
-    //   isReviewed: false
-    // },
+    {
+      id: 'r006',
+      facilityType: '과속방지턱',
+      damageSeverity: 'Low',
+      imageUrl: '/images/0202_light_clear_smooth_09003753.png',
+      timestamp: new Date('2024-06-06T08:00:00'),
+      location: '대전시 유성구',
+      description: '과속방지턱의 경미한 훼손을 감지',
+      acknowledged: false,
+      lat: 36.3620,
+      lng: 127.3531,
+      confidence: 9,
+      isReviewed: false
+    },
+    {
+      id: 'r007',
+      facilityType: '횡단보도',
+      damageSeverity: 'Medium',
+      imageUrl: '/images/0202_light_clear_smooth_09003452.png',
+      timestamp: new Date('2024-06-06T08:00:00'),
+      location: '대전시 유성구',
+      description: '횡단보도에서 경미한 훼손을 감지',
+      acknowledged: false,
+      lat: 36.3620,
+      lng: 127.3531,
+      confidence: 31,
+      isReviewed: false
+    },
   ];

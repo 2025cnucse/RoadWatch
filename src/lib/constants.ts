@@ -19,6 +19,6 @@ export const damageSeverities: { value: DamageSeverity; label: string }[] = [
 
 export const acknowledgedStatusOptions: { value: AcknowledgedStatus; label: string }[] = [
   { value: "all", label: "모든 상태" },
-  { value: "acknowledged", label: "확인됨" },
-  { value: "unacknowledged", label: "미확인" },
+  { value: "acknowledged", label: "정상으로 분류됨" },
+  { value: "unacknowledged", label: "훼손으로 분류됨" },
 ];

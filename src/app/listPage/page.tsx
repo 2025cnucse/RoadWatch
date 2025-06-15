@@ -85,7 +85,7 @@ export default function ListPage() {
 
     const targetReport = updatedReports.find(r => r.id === id);
     toast({
-      title: `보고서 ${targetReport?.acknowledged ? "확인됨" : "미확인됨"}`,
+      title: `보고서 ${targetReport?.acknowledged ? "정상으로 분류됨" : "훼손으로 분류됨"}`, /// 확인/미확인에서 변경함.
       description: `보고서 ID ${id} 상태가 업데이트되었습니다.`,
       variant: targetReport?.acknowledged ? "success" : "default",
     });
@@ -216,7 +216,7 @@ export default function ListPage() {
     const csvRows = displayedReports.map(report => {
       const facilityLabel = getFacilityTypeLabel(report.facilityType);
       const severityLabel = getDamageSeverityLabel(report.damageSeverity);
-      const acknowledgedLabel = report.acknowledged ? '확인됨' : '미확인';
+      const acknowledgedLabel = report.acknowledged ? '정상으로 분류됨' : '훼손으로 분류됨';    // 확인/미확인 -> 정상으로 분류/훼손으로 분류
       const formattedTimestamp = format(new Date(report.timestamp), 'yyyy-MM-dd HH:mm:ss');
 
       const escapeCsvField = (field: string | undefined) => {

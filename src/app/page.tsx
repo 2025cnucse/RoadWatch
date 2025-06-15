@@ -154,7 +154,7 @@ export default function MapPage() {
 
       // 데이터의 검토 여부(`isReviewed`)에 따라 마커의 투명도를 조절합니다.
       if (item.isReviewed) {
-        marker.setOpacity(0.5); // 검토 완료 시 반투명
+        marker.setOpacity(0.25); // 검토 완료 시 반투명
       } else {
         marker.setOpacity(1); // 미검토 시 불투명
       }
@@ -217,7 +217,7 @@ export default function MapPage() {
         onClick={() => window.location.href = '/listPage'}
         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow"
       >
-        목록 보기
+        탐지결과 한눈에보기
       </button>
     </div>
       <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
