@@ -212,6 +212,14 @@ export default function MapPage() {
   return (
     <>
       {/* 지도가 그려질 div 요소 */}
+    <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 50 }}>
+      <button
+        onClick={() => window.location.href = '/listPage'}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow"
+      >
+        목록 보기
+      </button>
+    </div>
       <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
 
       {/* 마커 상세 정보 및 수정 모달 */}
