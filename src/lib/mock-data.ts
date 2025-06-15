@@ -38,7 +38,7 @@ import type { DamageReport } from '@/types';
       location: '대전시 유성구',
       description: '횡단보도에서 경미한 훼손을 감지',
       acknowledged: false,
-      lat: 36.3627,
+      lat: 36.3810,
       lng: 127.3510,
       confidence: 44,
       isReviewed: false
@@ -68,7 +68,7 @@ import type { DamageReport } from '@/types';
       description: '과속방지턱에서 훼손을 감지',
       acknowledged: false,
       lat: 36.3650,
-      lng: 127.3531,
+      lng: 127.3551,
       confidence: 45,
       isReviewed: false
     },
@@ -81,7 +81,7 @@ import type { DamageReport } from '@/types';
       location: '대전시 유성구',
       description: '과속방지턱의 경미한 훼손을 감지',
       acknowledged: false,
-      lat: 36.3620,
+      lat: 36.3660,
       lng: 127.3531,
       confidence: 9,
       isReviewed: false
@@ -95,8 +95,8 @@ import type { DamageReport } from '@/types';
       location: '대전시 유성구',
       description: '횡단보도에서 경미한 훼손을 감지',
       acknowledged: false,
-      lat: 36.3620,
-      lng: 127.3531,
+      lat: 36.390,
+      lng: 127.3521,
       confidence: 31,
       isReviewed: false
     },

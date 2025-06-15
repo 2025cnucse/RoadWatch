@@ -44,6 +44,16 @@ export default function MapPage() {
     document.head.appendChild(script);
   }, []);
 
+  // ▼▼▼ 1. 이 useEffect를 추가하여 mock 데이터 변경을 감지하고 상태를 업데이트합니다. ▼▼▼
+  /**
+   * mock-data.ts 파일의 변경 사항을 감지하여 currentDamageReports 상태를 업데이트합니다.
+   * Next.js의 빠른 새로고침(Fast Refresh) 시에도 데이터 동기화를 보장합니다.
+   */
+  useEffect(() => {
+    setCurrentDamageReports(mockDamageReports);
+  }, [mockDamageReports]);
+  // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
   /**
    * confidence(신뢰도) 값에 따라 적절한 마커 이미지 URL을 반환하는 헬퍼 함수입니다.
    * @param confidence - 훼손 신뢰도 (0-100 사이의 숫자)
