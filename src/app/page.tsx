@@ -29,7 +29,7 @@ export default function MapPage() {
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
-      '//dapi.kakao.com/v2/maps/sdk.js?appkey=bcb988d7f31bf0c78599c87b7c852005&autoload=false'; // API 키 확인
+      '//dapi.kakao.com/v2/maps/sdk.js?appkey=a42968a24e434cf08183dbf676af5036&autoload=false'; // API 키 확인
     script.async = true;
     script.onload = () => {
       window.kakao.maps.load(() => initMap()); // initMap 호출
@@ -266,6 +266,14 @@ export default function MapPage() {
 
   return (
     <>
+    <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 50 }}>
+      <button
+        onClick={() => window.location.href = '/listPage'}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow"
+      >
+        목록 보기
+      </button>
+    </div>
       <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
       <ReportModal
         isOpen={modalOpen}
