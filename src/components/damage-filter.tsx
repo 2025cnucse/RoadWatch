@@ -40,7 +40,7 @@ export function DamageFilter({ onFilter, onReset, isLoading }: DamageFilterProps
       <CardHeader>
         <CardTitle className="text-xl flex items-center">
           <FilterIcon className="mr-2 h-6 w-6 text-primary" />
-          손상 보고서 필터
+          유성구 관내 훼손시설물 검색
         </CardTitle>
       </CardHeader>
       <CardContent>

@@ -3,7 +3,7 @@ import type { DamageReport } from '@/types';
   export const mockDamageReports: DamageReport[] = [
     {
       id: 'r001',
-      facilityType: 'Road',
+      facilityType: '과속방지턱',
       damageSeverity: 'High',
       imageUrl: '/images/0202_light_clear_traffic_10000768.png',
       timestamp: new Date('2024-06-01T10:30:00'),
@@ -12,12 +12,12 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       "lat": 36.3651,
       "lng": 127.3552,
-      "importance": "middle",
+      confidence: 95,
       isReviewed: false
     },
     {
       id: 'r002',
-      facilityType: 'Road',
+      facilityType: '횡단보도',
       damageSeverity: 'Medium',
       imageUrl: '/images/0202_light_clear_traffic_10000786.png',
       timestamp: new Date('2024-06-02T14:15:00'),
@@ -26,12 +26,12 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3627,
       lng: 127.3513,
-      importance: "low",
+      confidence: 89,
       isReviewed: false
     },
     {
       id: 'r003',
-      facilityType: 'Road',
+      facilityType: '횡단보도',
       damageSeverity: 'Low',
       imageUrl: '/images/0202_light_clear_traffic_10000791.png',
       timestamp: new Date('2024-06-03T09:00:00'),
@@ -40,13 +40,13 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3627,
       lng: 127.3510,
-      importance: "low",
+      confidence: 59,
       isReviewed: false
 
     },
     {
       id: 'r004',
-      facilityType: 'Road',
+      facilityType: '횡단보도',
       damageSeverity: 'High',
       imageUrl: '/images/0202_light_clear_traffic_10000853.png',
       timestamp: new Date('2024-06-04T16:45:00'),
@@ -55,21 +55,21 @@ import type { DamageReport } from '@/types';
       acknowledged: false,
       lat: 36.3610,
       lng: 127.3531,
-      importance: "low",
+      confidence: 69,
       isReviewed: false
     },
     {
       id: 'r005',
-      facilityType: 'Sign',
+      facilityType: '과속방지턱',
       damageSeverity: 'Medium',
       imageUrl: '/images/0202_light_clear_traffic_10000795.png',
       timestamp: new Date('2024-06-05T11:20:00'),
       location: '대전시 유성구',
-      description: '',
+      description: '과속방지턱에서 훼손을 감지',
       acknowledged: false,
       lat: 36.3650,
       lng: 127.3531,
-      importance: "low",
+      confidence: 37,
       isReviewed: false
     },
     // {
@@ -83,7 +83,7 @@ import type { DamageReport } from '@/types';
     //   acknowledged: false,
     //   lat: 36.3620,
     //   lng: 127.3531,
-    //   importance: "low",
+    //   confidence: "low",
     //   isReviewed: false
     // },
   ];

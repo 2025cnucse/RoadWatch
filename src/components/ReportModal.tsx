@@ -14,6 +14,7 @@ export interface MarkerData {
   facilityType?: string;
   damageSeverity?: 'Low' | 'Medium' | 'High';
   timestamp?: Date;
+  confidence?: number;
 }
 
 interface ReportModalProps {
@@ -104,6 +105,10 @@ export default function ReportModal({ isOpen, onClose, marker, onUpdateSeverity 
               ))}
             </select>
           </p>
+          {/* 2. '훼손 신뢰도' 항목을 여기에 추가합니다. */}
+          {marker.confidence !== undefined && (
+            <p><strong>훼손 신뢰도:</strong> {marker.confidence}%</p>
+          )}
           <p><strong>위도:</strong> {marker.lat.toFixed(6)}</p>
           <p><strong>경도:</strong> {marker.lng.toFixed(6)}</p>
           {marker.description && (

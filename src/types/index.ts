@@ -1,4 +1,4 @@
-export type FacilityType = "Bridge" | "Road" | "Sign" | "Traffic Light" | "Guardrail" | "Other";
+export type FacilityType = "횡단보도" | "Road" | "과속방지턱" | "Traffic Light" | "Guardrail" | "Other";
 export type DamageSeverity = "Low" | "Medium" | "High";
 export type AcknowledgedStatus = "all" | "acknowledged" | "unacknowledged";
 
@@ -14,6 +14,6 @@ export interface DamageReport {
   acknowledged: boolean;
   lat: number;
   lng: number;
-  importance: string;
+  confidence: number;
   isReviewed?: boolean;
 }
