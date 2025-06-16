@@ -3,9 +3,10 @@
 
 
 
-![image](https://github.com/user-attachments/assets/032324f1-ff68-47c1-8cde-7d793e6a72ec)
+![Uploading image.png…]()
 
-행정구역 단위로 구분하여, 훼손시설물이 감지되면 해당 훼손시설물의 GPS를 지도에 마커로 표시함.
+
+행정구역 단위로 구분하여, 탐지된 훼손시설물이 지도에 마커로 표시함.
 
 
 ![image](https://github.com/user-attachments/assets/87956807-8eda-4f82-a11e-b77a4d007dc8)
