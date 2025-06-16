@@ -6,7 +6,7 @@ export function AppHeader() {
       <div className="container mx-auto px-4 py-4 flex items-center">
         <ScanEye className="h-8 w-8 text-primary mr-3" />
         <h1 className="text-2xl font-bold text-foreground">
-          RoadWatch
+          RoadWatch 유성구 도로관리자: 홍길동
         </h1>
       </div>
     </header>

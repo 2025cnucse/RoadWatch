@@ -35,7 +35,7 @@ export default function MapPage() {
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
-      `//dapi.kakao.com/v2/maps/sdk.js?appkey=bcb988d7f31bf0c78599c87b7c852005&autoload=false`;
+      `//dapi.kakao.com/v2/maps/sdk.js?appkey=a42968a24e434cf08183dbf676af5036&autoload=false`;
     script.async = true;
     script.onload = () => {
       // 스크립트 로드가 완료되면, Kakao Maps API를 초기화하고 지도를 생성합니다.
@@ -59,8 +59,8 @@ export default function MapPage() {
    */
   const getMarkerImageUrlByConfidence = (confidence?: number): string => {
     if (confidence !== undefined) {
-      if (confidence > 50) return '/red-dot.png';     // 신뢰도 높음, 훼손 확실, 점검 필요 (빨강)
-      if (confidence <= 50) return '/yellow-dot.png';  // 신뢰도 중간, 확인 필요함.
+      if (confidence > 50) return '/red-dot-remake.png';     // 신뢰도 높음, 훼손 확실, 점검 필요 (빨강)
+      if (confidence <= 50) return '/yellow-dot-remake.png';  // 신뢰도 중간, 확인 필요함.
     }
     return '/marker-default.png'; // 신뢰도 값 없을 시 기본 마커
   };
@@ -77,7 +77,7 @@ export default function MapPage() {
     // 지도 생성
     const map = new window.kakao.maps.Map(container, {
       center: new window.kakao.maps.LatLng(36.35, 127.38), // 초기 중심 좌표 (대전)
-      level: 9, // 초기 줌 레벨
+      level: 8, // 초기 줌 레벨
     });
     container.__kakao_map_instance__ = map; // 생성된 지도 인스턴스를 나중에 참조할 수 있도록 저장
 
@@ -144,7 +144,7 @@ export default function MapPage() {
 
       const markerImage = new window.kakao.maps.MarkerImage(
         markerImageUrl,
-        new window.kakao.maps.Size(35, 35)
+        new window.kakao.maps.Size(65, 65)
       );
 
       const marker = new window.kakao.maps.Marker({
