@@ -44,7 +44,6 @@ export default function MapPage() {
     document.head.appendChild(script);
   }, []);
 
-  // ▼▼▼ 1. 이 useEffect를 추가하여 mock 데이터 변경을 감지하고 상태를 업데이트합니다. ▼▼▼
   /**
    * mock-data.ts 파일의 변경 사항을 감지하여 currentDamageReports 상태를 업데이트합니다.
    * Next.js의 빠른 새로고침(Fast Refresh) 시에도 데이터 동기화를 보장합니다.
@@ -52,7 +51,6 @@ export default function MapPage() {
   useEffect(() => {
     setCurrentDamageReports(mockDamageReports);
   }, [mockDamageReports]);
-  // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
   /**
    * confidence(신뢰도) 값에 따라 적절한 마커 이미지 URL을 반환하는 헬퍼 함수입니다.
@@ -61,9 +59,8 @@ export default function MapPage() {
    */
   const getMarkerImageUrlByConfidence = (confidence?: number): string => {
     if (confidence !== undefined) {
-      if (confidence <= 20) return '/red-dot.png';     // 신뢰도 낮음 (빨강)
-      if (confidence <= 50) return '/yellow-dot.png';  // 신뢰도 중간 (노랑)
-      return '/green-dot.png';   // 신뢰도 높음 (초록)
+      if (confidence > 50) return '/red-dot.png';     // 신뢰도 높음, 훼손 확실, 점검 필요 (빨강)
+      if (confidence <= 50) return '/yellow-dot.png';  // 신뢰도 중간, 확인 필요함.
     }
     return '/marker-default.png'; // 신뢰도 값 없을 시 기본 마커
   };
@@ -140,13 +137,8 @@ export default function MapPage() {
     currentMarkersRef.current.forEach(marker => marker.setMap(null));
     currentMarkersRef.current = []; // 마커 참조 배열을 비웁니다.
 
-    // confidence가 70 초과인 데이터는 필터링하여 지도에 표시하지 않습니다.
-    const filteredReports = reports.filter(
-      (report) => report.confidence === undefined || report.confidence <= 70
-    );
-
-    // 필터링된 데이터를 순회하며 각 위치에 마커를 생성합니다.
-    filteredReports.forEach((item) => {
+    // ▼▼▼ 1. 필터링 로직을 제거하고, 원본 reports 배열을 사용하도록 변경합니다. ▼▼▼
+    reports.forEach((item) => {
       // 신뢰도 값에 따라 마커 이미지 URL을 결정합니다.
       const markerImageUrl = getMarkerImageUrlByConfidence(item.confidence);
 
@@ -222,14 +214,14 @@ export default function MapPage() {
   return (
     <>
       {/* 지도가 그려질 div 요소 */}
-    <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 50 }}>
-      <button
-        onClick={() => window.location.href = '/listPage'}
-        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow"
-      >
-        탐지결과 한눈에보기
-      </button>
-    </div>
+      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 50 }}>
+        <button
+          onClick={() => window.location.href = '/listPage'}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow"
+        >
+          탐지결과 상세보기
+        </button>
+      </div>
       <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
 
       {/* 마커 상세 정보 및 수정 모달 */}
